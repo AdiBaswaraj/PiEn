@@ -1,0 +1,40 @@
+[package]
+name = "pien"
+version = "0.1.0"
+edition = "2021"
+description = "PiEn — a pirate game engine focused on emergent simulation, physics-driven combat, and treasure hunting"
+license = "MIT OR Apache-2.0"
+
+[dependencies]
+bevy = { version = "0.14", default-features = false, features = [
+    "bevy_core_pipeline",
+    "bevy_render",
+    "bevy_pbr",
+    "bevy_sprite",
+    "bevy_winit",
+    "bevy_asset",
+    "bevy_scene",
+    "bevy_text",
+    "bevy_ui",
+    "bevy_gizmos",
+    "x11",
+    "png",
+    "tonemapping_luts",
+    "ktx2",
+    "zstd",
+    "multi_threaded",
+] }
+noise = "0.9"
+rand = "0.8"
+serde = { version = "1", features = ["derive"] }
+
+[profile.dev]
+opt-level = 1
+
+[profile.dev.package."*"]
+opt-level = 3
+
+[profile.release]
+lto = "thin"
+codegen-units = 1
+panic = "abort"
