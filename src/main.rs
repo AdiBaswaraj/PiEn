@@ -33,6 +33,12 @@ fn main() {
                 title: "PiEn — Pirate Engine".into(),
                 resolution: (1280.0, 720.0).into(),
                 present_mode: bevy::window::PresentMode::AutoVsync,
+                #[cfg(target_arch = "wasm32")]
+                canvas: Some("#pien-canvas".into()),
+                #[cfg(target_arch = "wasm32")]
+                fit_canvas_to_parent: true,
+                #[cfg(target_arch = "wasm32")]
+                prevent_default_event_handling: false,
                 ..default()
             }),
             ..default()

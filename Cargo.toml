@@ -6,6 +6,10 @@ description = "PiEn — a pirate game engine focused on emergent simulation, phy
 license = "MIT OR Apache-2.0"
 
 [dependencies]
+# Shared across native and wasm. Target-specific tables below ADD the
+# platform-only features (x11 vs webgl2, native threads vs none).
+# Bevy must live here at the top level so its proc-macros can locate the
+# crate via CARGO_MANIFEST_DIR.
 bevy = { version = "0.14", default-features = false, features = [
     "bevy_core_pipeline",
     "bevy_render",
@@ -17,16 +21,29 @@ bevy = { version = "0.14", default-features = false, features = [
     "bevy_text",
     "bevy_ui",
     "bevy_gizmos",
-    "x11",
     "png",
     "tonemapping_luts",
     "ktx2",
     "zstd",
-    "multi_threaded",
 ] }
 noise = "0.9"
 rand = "0.8"
 serde = { version = "1", features = ["derive"] }
+
+[target.'cfg(not(target_arch = "wasm32"))'.dependencies]
+bevy = { version = "0.14", default-features = false, features = [
+    "x11",
+    "multi_threaded",
+] }
+
+[target.'cfg(target_arch = "wasm32")'.dependencies]
+bevy = { version = "0.14", default-features = false, features = ["webgl2"] }
+getrandom = { version = "0.2", features = ["js"] }
+# getrandom 0.3 is pulled in transitively (uuid/ahash). Enable its wasm_js
+# backend so the rustflag `--cfg getrandom_backend="wasm_js"` has something
+# to bind to. uuid also needs its `js` feature on wasm.
+getrandom_v03 = { package = "getrandom", version = "0.3", features = ["wasm_js"] }
+uuid = { version = "1", features = ["js"] }
 
 [profile.dev]
 opt-level = 1
@@ -38,3 +55,8 @@ opt-level = 3
 lto = "thin"
 codegen-units = 1
 panic = "abort"
+
+[profile.web-release]
+inherits = "release"
+opt-level = "s"
+strip = true
