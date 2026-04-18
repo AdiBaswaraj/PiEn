@@ -77,8 +77,16 @@
       await init({ module_or_path: wasmBuffer });
       boot.style.display = "none";
     } catch (e) {
-      msg.textContent = "Failed to start: " + e.message;
-      console.error(e);
+      // winit uses a thrown exception to unwind its startup stack on the web
+      // platform. Message starts with "Using exceptions for control flow" —
+      // this means the game IS running, we just need to get out of the way.
+      const text = (e && e.message) || String(e);
+      if (text.includes("Using exceptions for control flow")) {
+        boot.style.display = "none";
+      } else {
+        msg.textContent = "Failed to start: " + text;
+        console.error(e);
+      }
     }
   </script>
 </body>
