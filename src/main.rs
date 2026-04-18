@@ -12,6 +12,7 @@ mod combat;
 mod creatures;
 mod physics;
 mod player;
+mod render;
 mod treasure;
 mod weather;
 mod world;
@@ -20,6 +21,7 @@ use combat::CombatPlugin;
 use creatures::CreaturesPlugin;
 use physics::PhysicsPlugin;
 use player::PlayerPlugin;
+use render::RenderPlugin;
 use treasure::TreasurePlugin;
 use weather::WeatherPlugin;
 use world::WorldPlugin;
@@ -45,6 +47,7 @@ fn main() {
             CombatPlugin,
             TreasurePlugin,
             PlayerPlugin,
+            RenderPlugin,
         ))
         .add_systems(Update, advance_sim_time)
         .run();

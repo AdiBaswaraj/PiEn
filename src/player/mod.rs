@@ -149,7 +149,7 @@ fn update_camera(
 ) {
     let Ok(ptr) = player.get_single() else { return };
     let Ok(mut c) = cam.get_single_mut() else { return };
-    let desired = ptr.translation + Vec3::new(0.0, 60.0, 30.0);
+    let desired = ptr.translation + Vec3::new(0.0, 30.0, 25.0);
     c.translation = c.translation.lerp(desired, 0.1);
     c.look_at(ptr.translation, Vec3::Y);
 }
