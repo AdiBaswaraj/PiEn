@@ -38,10 +38,15 @@ these, reject it; if it fails one, reskin it in Blender before use.
 | Surface | Flat or one detail-normal pass; baked AO ok | Smooth-shaded; glossy plastic; no wear |
 | Materials | PBR-ready (diffuse / normal / ORM) | Baked vertex color only, no room to re-light |
 
-Reference north stars: **Valheim** (floor — we must at least match),
-**Enshrouded** (ceiling — where the Nice tier should land),
-**Sea of Thieves** (too stylized — avoid the face/eye language),
-**Skull and Bones** (too realistic — avoid the material complexity).
+Reference north stars:
+- **Enshrouded** — **primary target** for environment *and* characters
+  *and* bosses. Grounded proportions, weathered armor, PBR materials,
+  serious faces. When in doubt, look at an Enshrouded screenshot.
+- **Valheim** — perf floor. Potato-tier degradation lands here:
+  flat-shaded, smaller textures, no detail normals. Still grounded.
+- **Sea of Thieves** — *too stylized*. Avoid the face / eye language.
+- **Skull and Bones** — *too realistic*. Avoid the material complexity
+  (no cloth sim, no rope physics, no per-plank weathering).
 
 ## 2. Source rolodex
 
@@ -65,23 +70,58 @@ no licence at all — we can't use it.
 ## 3. Per-category plan
 
 ### Characters & NPCs
-- Rig: Mixamo humanoid (any of their default bases) OR Quaternius humanoid.
-- Animations we need: **idle, walk, run, attack, hit, death, wield-sword,
-  aim-pistol, swim**. All free on Mixamo.
-- Race variants handled by material tint + optional swap mesh, not by new rigs.
+- **Target fidelity: Enshrouded-tier.** Real 7–8 head proportions,
+  weathered armor / cloth / leather with distinct PBR materials,
+  serious or plain faces — no cartoon expressions.
+- **Polycount:** ~5–10k tris for hero characters (player, named NPCs,
+  bosses), ~2–3k for generic townsfolk / crew, with one LOD step down
+  at distance. LOD0 is what close-ups see; LOD1 is what you see from
+  the deck of your ship.
+- **Texture set:** 2K PBR (`_diffuse`, `_normal`, `_orm`) for hero;
+  1K for generic. Detail normals on metal + leather + coarse cloth.
+- **Rig:** Mixamo humanoid base — decent geometry, good weight paint,
+  retargets cleanly. Reskin / retopo in Blender if we need custom
+  armor or race silhouettes (merman tail, orc mass).
+- **Animations:** **idle, walk, run, sprint, attack, hit, death,
+  wield-sword, aim-pistol, swim, climb-rope**. All free on Mixamo.
+- **Race variants:** material tint + optional swap mesh (helmets,
+  tails, horns), **not** new rigs. One skeleton, many silhouettes.
+- **Potato-tier fallback:** the same mesh with flat-shaded material,
+  1K textures, no detail normals. Still reads grounded, just plainer.
 
-### Monsters (non-humanoid)
-- Fire / Ice / Sand Dragon → Quaternius "Dragon Pack" or Itch.io CC0 dragon.
-- Kraken → CC0 octopus, scaled up. Tentacle sway handled in shader.
-- Sea Serpent / Giant Snake → Same source; serpent meshes with a swim clip.
-- Wyvern → Any small-dragon / bat-wing model.
-- Undead → Quaternius skeleton rig, reuse humanoid animations.
-- Eldritch → Stretch. Stay on primitive until a pack emerges.
+### Monsters & bosses (non-humanoid)
+- **Target fidelity: Enshrouded-tier** for bosses (dragons, kraken,
+  named apex creatures) — they carry the memorable fights, so they
+  get the same polycount + PBR budget as hero characters (~8–12k tris,
+  2K PBR). Regular wildlife / grunts stay cheaper (~2–4k tris, 1K).
+- Fire / Ice / Sand Dragon → Itch.io CC0 dragon base, reskinned in
+  Blender for per-element palette and weathering. Quaternius "Dragon
+  Pack" is *too* cartoon for this tier — use only if nothing else.
+- Kraken → CC0 octopus base, scaled up, tentacle sway in shader.
+  Needs the beak and eye detail to land; reskin if the base is too
+  toy-like.
+- Sea Serpent / Giant Snake → serpent mesh with a swim clip; add
+  weathered scale normal map in Blender.
+- Wyvern → small-dragon / bat-wing base, reskinned.
+- Undead → Quaternius skeleton rig (shape works; material repaint to
+  weathered bone, no cartoon grin), reuse humanoid animations.
+- Eldritch → Stretch. Stay on primitive until a fitting CC0 base
+  emerges or we're ready to Blender one from the kraken base.
 
 ### Ships
-- Hull (rigid body) — Kenney Pirate Kit has small, medium, large hulls.
-- Sail + mast + wheel + flag + cannons — separate meshes, parented to hull.
-- Flag colours driven by faction component → material tint. One mesh, many factions.
+- **Target fidelity: Enshrouded-tier** — grounded proportions, real
+  1:1 scale (a galleon is ~40m long, not 8m), weathered wood planks
+  via detail normal, tarnished metal fittings via ORM texture.
+- **Polycount:** ~15–25k tris for a hero hull (player ship, named
+  faction flagships), ~5–8k for generic NPC hulls. Rigging/ropes are
+  baked into normal maps, not modeled geometry.
+- Hull comes from curated Sketchfab / Itch.io CC0 pulls (galleons,
+  brigantines, sloops). Kenney Pirate Kit hulls are **too small and
+  too toy-shaped** for this tier.
+- Sail + mast + wheel + flag + cannons — separate meshes, parented to
+  hull. Sail animates via vertex shader wind deformation (cheap).
+- Flag colours driven by faction component → material tint. One mesh,
+  many factions. Same for sail stripe patterns.
 
 ### Biomes / terrain
 - Terrain itself is generated in code (done). We don't asset this.
@@ -97,14 +137,21 @@ no licence at all — we can't use it.
   | Coral reef (underwater) | Coral clusters, kelp, shell piles |
 
 ### Buildings / props
-- Kenney "Pirate Kit" covers docks, crates, barrels, taverns, huts.
-- Castle / tower stuff for faction capitals: Kenney "Castle Kit".
-- Ruins: reuse castle kit + scatter code.
+- Target: grounded, weathered wood + stone, not cartoon kit-bashed
+  blocks. Docks, crates, barrels, taverns, huts → curated Sketchfab /
+  Itch.io CC0; Quaternius "Medieval" works for inland towns after a
+  palette retint.
+- Castle / tower stuff for faction capitals → Quaternius "Castle Kit"
+  or equivalent; Kenney "Castle Kit" is placeholder-only (too toy).
+- Ruins: reuse castle kit + scatter code + wear overlay in shader.
 
 ### Weapons & gear
-- Cutlass, flintlock, musket, harpoon, cannon → Kenney "Weapon Pack".
-- Hats, coats, boots → Quaternius or pirate-specific Itch packs.
-- Parented to character hand / head bones by name.
+- Cutlass, flintlock, musket, harpoon, cannon → curated CC0 pulls
+  with real proportions (cannon is a *heavy* bronze tube, not a
+  cartoon pipe). Kenney "Weapon Pack" is placeholder-only.
+- Hats, coats, boots → Quaternius or pirate-specific Itch CC0,
+  palette retinted to the muted world look.
+- Parented to character hand / head / back sockets by name.
 
 ### UI
 - Frame / panels / buttons → Kenney UI Pack (pick the parchment one).
