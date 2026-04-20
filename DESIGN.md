@@ -26,8 +26,12 @@ serve one of them, it doesn't ship.
    Krakens fight serpents. The player who reads the world wins.
 3. **Multiple valid paths.** A player who never picks up a sword and only
    trades should reach an ending. So should a player who burns the world.
-4. **Runs on a potato.** Flat-shaded, unlit-where-possible, cheap
-   simulation. Target: 60 FPS at 1080p on integrated graphics.
+4. **Scales from potato to nice.** 60 FPS at 1080p on integrated
+   graphics is the floor; richer hardware unlocks volumetric fog,
+   soft shadows, longer draw distance, screen-space reflections.
+   Art direction is locked to **Valheim-grounded low-poly** with
+   **Enshrouded-level shader / post polish** — polish lives in the
+   shader / post stack, never in geometry or texture bloat.
 
 ## 3. World Structure
 
@@ -111,18 +115,46 @@ Things in the brainstorm we are *not* doing, or doing differently:
   gameplay system.** No slave-trading mechanic.
 - **No multiplayer / networking.** Single player, local save.
 
-## 7. Low-Spec Performance Rules
+## 7. Performance Rules & Graphics Tiers
 
-These are non-negotiable; review every PR against them.
+The rules below describe the **Potato tier** — the non-negotiable floor
+every PR is reviewed against. Standard and Nice tiers add polish on top;
+they never weaken the floor.
+
+### 7a. Potato tier (floor — must always work)
 
 1. Flat-shaded, unlit where the look allows; one directional light.
-2. No real-time shadows in the default config.
+2. No real-time shadows in the default config (baked AO only).
 3. One mesh per chunk; instancing for vegetation/decor.
 4. View radius capped — streaming despawns chunks aggressively.
 5. AI thinks at 20 Hz, not per frame.
 6. World "heartbeat" (faction sim, off-screen events) at 0.1 Hz.
 7. Particle counts capped per cell; degrade silently on slow frames.
 8. Audio mixed in fewest channels possible.
+9. Textures 512–1024 for decor, 1024 for hero, 2K only for the player
+   ship hull / player character / named NPCs.
+
+### 7b. Standard tier (most laptops, ~mid-range GPUs)
+
+Enables on top of Potato:
+- Low-res (1024²) cascaded shadow maps, one cascade.
+- Half-resolution volumetric fog.
+- Water shader: foam, depth fog, fake refraction.
+- Detail normals on wood / metal / rock materials.
+- Longer view radius (+1 chunk).
+- HDR + ACES / AgX tonemapping.
+
+### 7c. Nice tier (modern mid-range+)
+
+Enables on top of Standard:
+- Full-res volumetric fog.
+- Screen-space reflections on water.
+- Higher shadow res, two cascades.
+- Longer view radius again (+2 chunks total vs Potato).
+- Raised particle caps.
+
+No tier is allowed to lift geometry detail or texture resolution past
+the caps in §7a — polish is shader / post only.
 
 ## 8. Phase Plan
 
@@ -192,5 +224,7 @@ don't start phase N+1 until phase N is fun.
 - **Procedural quests vs hand-authored beats?** Default to procedural
   (treasure maps, bounties, faction missions). Hand-author only the
   Cursed Survivor opening and the four deity trials.
-- **Art direction?** Stylised low-poly is the cheapest and ages well.
-  Lock this in before Phase 2 art swap.
+- ~~**Art direction?**~~ **Resolved** (2026-04): Valheim-grounded
+  low-poly geometry + Enshrouded-level shader / post polish, behind a
+  Potato / Standard / Nice graphics-tier slider. See §7 and
+  `ASSETS.md` for the detailed style guardrails and source list.
