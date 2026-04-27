@@ -1,8 +1,8 @@
 [package]
-name = "pien"
+name = "unseeing_tides"
 version = "0.1.0"
 edition = "2021"
-description = "PiEn — a pirate game engine focused on emergent simulation, physics-driven combat, and treasure hunting"
+description = "The Unseeing Tides — an emergent open-world pirate sandbox built on the Vortexel engine."
 license = "MIT OR Apache-2.0"
 
 [dependencies]

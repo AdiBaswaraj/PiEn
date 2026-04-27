@@ -1,7 +1,12 @@
-# PiEn — Design Doc
+# The Unseeing Tides — Design Doc
 
 The canonical "what we're building" reference. This is intentionally short
 and opinionated — it's what we point at when scope creep tries to sneak in.
+
+The game is **The Unseeing Tides**. The engine layer underneath it (the
+plugins in `src/`: world, weather, physics, creatures, combat, treasure,
+render) is **Vortexel**. They live in one crate today; if Vortexel ever
+needs to power a second project we'll split into a workspace.
 
 ## 1. Pitch
 

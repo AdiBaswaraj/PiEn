@@ -1,10 +1,11 @@
-//! PiEn — pirate game engine entry point.
+//! The Unseeing Tides — game entry point.
 //!
-//! The engine is composed as Bevy plugins. Each plugin owns a slice of the
-//! simulation (world, weather, physics, creatures, combat, treasure, player).
-//! Systems talk through components and events, which keeps subsystems
-//! decoupled and lets new behaviours emerge from their interactions rather
-//! than from hand-scripted sequences.
+//! The game is built on Vortexel, our emergent-simulation engine layer:
+//! a set of Bevy plugins, one per simulation slice (world, weather,
+//! physics, creatures, combat, treasure, player). Systems talk through
+//! components and events, which keeps subsystems decoupled and lets new
+//! behaviours emerge from their interactions rather than from
+//! hand-scripted sequences.
 
 use bevy::prelude::*;
 
@@ -30,7 +31,7 @@ fn main() {
     App::new()
         .add_plugins(DefaultPlugins.set(WindowPlugin {
             primary_window: Some(Window {
-                title: "PiEn — Pirate Engine".into(),
+                title: "The Unseeing Tides".into(),
                 resolution: (1280.0, 720.0).into(),
                 present_mode: bevy::window::PresentMode::AutoVsync,
                 ..default()

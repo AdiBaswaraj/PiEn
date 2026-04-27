@@ -1,10 +1,18 @@
-# PiEn — Pirate Engine
+# The Unseeing Tides
 
-A small, performance-minded engine for an open-world pirate game focused on
-**emergent systems over scripted events**. A massive ocean, sparse islands
-with wildly different biomes, simulated weather, and monsters whose strengths
-and weaknesses are described declaratively so the player can beat them with
-the environment instead of a prescribed strategy.
+An open-world pirate sandbox where gods, factions and apex monsters react
+to *what you actually do*. Sail a massive ocean, beach on wildly different
+islands, anger a faction, drown a fire dragon, and watch the world remember.
+
+It's built on **Vortexel** — the engine layer in this repo: a small,
+performance-minded ECS substrate (Bevy + Rust) focused on **emergent
+systems over scripted events**. Vortexel knows physics, weather,
+affinities and memory; quests and "boss strategies" fall out of those, not
+out of bespoke code per fight.
+
+For the full design pillars and phase plan, see `DESIGN.md`. For the art /
+audio / content pipeline, see `ASSETS.md`. For the day-to-day workflow,
+see `WORKFLOW.md`.
 
 ## Why this stack
 
@@ -13,7 +21,7 @@ the environment instead of a prescribed strategy.
 | **Rust** | Zero-cost abstractions + memory safety. Great for simulation code that has to run every frame. |
 | **Bevy (ECS)** | Data-oriented ECS parallelises trivially across cores. Components make emergent monster/environment interactions almost free to add. Permissive licence. |
 | **noise (Perlin/Simplex)** | Deterministic world generation from a seed. No asset pipeline needed for terrain. |
-| **Flat / unlit rendering, no shadows** | You asked for low GPU overhead. Bevy's PBR is off by default in shadows; one directional light is effectively free. Upgrade later when the game is fun. |
+| **Tiered rendering (Potato / Standard / Nice)** | Geometry budget stays cheap (Valheim-grounded low-poly); polish lives in the shader / post stack and scales with hardware. Potato = flat-shaded, no shadows; Nice = volumetric fog + SSR. See `DESIGN.md` §7. |
 | **Cell-based weather** | Weather samples live on a coarse grid, not per-tile. Cost stays flat no matter how big the map grows. |
 | **Chunk streaming** | Only chunks around the player are resident in the ECS. The "massive map" is bounded only by `f32` precision, not RAM. |
 
@@ -99,13 +107,14 @@ iterating.
 - **New environmental kill** — add a rule in `combat::environmental_damage`
   reading whatever `Environment` / `Creature` / `Affinity` combo you want.
 
-## What's intentionally missing
+## What's intentionally missing (yet)
 
-- No art. The world is gizmos + a camera right now; you asked for low
-  graphical priority, so the engine leaves rendering open for you to style
-  later (flat shaded islands, stylised sprites, low-poly ships — all cheap).
-- No networking. Single player, local save.
-- No save/load yet. Components derive `Serialize` where it's sensible so
-  adding `bevy_save` or a custom serde layer later is a weekend of work.
-- No audio. Fog horns, kraken groans etc. belong in an audio plugin that
-  subscribes to `WeatherEvent` / `CreatureKilled`.
+- **Final art.** Currently primitives + per-chunk vertex-coloured terrain.
+  Asset swap target is **Enshrouded-tier grounded low-poly** with **Valheim
+  as the perf floor** — see `ASSETS.md` for sources, naming, style
+  guardrails, and the Tripo AI → Blender hero-asset workflow.
+- **Networking.** Single player, local save. No multiplayer planned.
+- **Save / load.** Components derive `Serialize` where sensible; landing
+  the actual save layer is a Phase 1 task.
+- **Audio.** Fog horns, kraken groans, cannon thunder — they'll subscribe
+  to `WeatherEvent` / `CreatureKilled` from a future audio plugin.

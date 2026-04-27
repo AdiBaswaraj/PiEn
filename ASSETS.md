@@ -1,8 +1,9 @@
 # ASSETS.md — the art / audio / content pipeline
 
-The asset library + pipeline for PiEn. Read alongside `DESIGN.md` (scope)
-and `WORKFLOW.md` (process). The goal: every asset type has one sanctioned
-source, one file format, and one place in the repo. No ambiguity.
+The asset library + pipeline for **The Unseeing Tides**. Read alongside
+`DESIGN.md` (scope) and `WORKFLOW.md` (process). The goal: every asset
+type has one sanctioned source, one file format, and one place in the
+repo. No ambiguity.
 
 ## 1. Principles
 

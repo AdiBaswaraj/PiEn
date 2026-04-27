@@ -1,4 +1,4 @@
-# Workflow — how we build PiEn together
+# Workflow — how we build The Unseeing Tides together
 
 You're the player + product owner. I'm the engineer. This file is the
 working agreement.
@@ -11,8 +11,8 @@ working agreement.
    Git for Windows or WSL).
 3. **Clone the repo** —
    ```
-   git clone <your-repo-url> PiEn
-   cd PiEn
+   git clone <your-repo-url> unseeing-tides
+   cd unseeing-tides
    git checkout claude/pirate-game-engine-EPMnv
    ```
 4. **Optional but nice:** VS Code + the `rust-analyzer` extension. Lets
