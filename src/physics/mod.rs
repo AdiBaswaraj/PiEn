@@ -156,9 +156,12 @@ fn apply_buoyancy(
         let buoyant_force = ocean.water_density * ocean.gravity * volume;
         let net = buoyant_force - body.mass * ocean.gravity;
         body.velocity.y += (net / body.mass) * dt;
-        // Water drag — heavy so things don't oscillate forever.
+        // Water drag — heavy so things don't oscillate forever. Y damping
+        // stops the buoyancy/gravity tug-of-war from making the ship bob
+        // forever; it settles to the waterline within a couple of seconds.
         let drag = 1.5 * submerged_h;
         body.velocity.x *= (1.0 - drag * dt).max(0.0);
+        body.velocity.y *= (1.0 - drag * dt).max(0.0);
         body.velocity.z *= (1.0 - drag * dt).max(0.0);
     }
 }

@@ -281,10 +281,10 @@ pub fn find_player_spawn(seed: u64, gen: &WorldGen) -> Vec3 {
             let is_shallow = h > gen.sea_level - 0.20;
             if is_water && is_shallow {
                 if fallback.is_none() {
-                    fallback = Some(Vec3::new(x, 1.0, z));
+                    fallback = Some(Vec3::new(x, 0.5, z));
                 }
                 if has_land_within(&sampler, gen, x, z, land_search_radius) {
-                    return Vec3::new(x, 1.0, z);
+                    return Vec3::new(x, 0.5, z);
                 }
             }
         }
@@ -292,7 +292,7 @@ pub fn find_player_spawn(seed: u64, gen: &WorldGen) -> Vec3 {
 
     // No island in range — drop the player in the first water tile we saw,
     // or back at origin (last-ditch; the world genuinely has no water here).
-    fallback.unwrap_or(Vec3::new(0.0, 1.0, 0.0))
+    fallback.unwrap_or(Vec3::new(0.0, 0.5, 0.0))
 }
 
 fn has_land_within(

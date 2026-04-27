@@ -88,12 +88,16 @@ fn spawn_player_ship(
     let spawn = find_player_spawn(seed.0, &gen);
     info!("Player spawn picked at world ({:.1}, {:.1})", spawn.x, spawn.z);
 
-    // The player ship. Large floats = stable; low damping = carries momentum.
+    // The player ship. Mass is tuned so the buoyant force from the float
+    // volume (≈230 m³ when fully submerged, with water_density=1) holds
+    // the ship at roughly 35% submerged — i.e. a sensible waterline.
+    // If you raise mass much past ~120 the ship sinks; past ~50 it floats
+    // like a cork on top of the waves.
     commands.spawn((
         Player,
         Ship::default(),
         Captain::default(),
-        Body { velocity: Vec3::ZERO, mass: 500.0, linear_damping: 0.15 },
+        Body { velocity: Vec3::ZERO, mass: 80.0, linear_damping: 0.15 },
         Floats {
             half_extents: Vec3::new(3.0, 1.2, 8.0),
             sail: 0.0,
