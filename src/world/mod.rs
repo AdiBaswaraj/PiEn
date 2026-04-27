@@ -254,6 +254,67 @@ impl WorldSampler {
     }
 }
 
+/// Pick a player spawn point. We want **open water within sight of land** —
+/// the Phase 1 spec says the player wakes up in the open sea near an
+/// island. Spirals outward from the world origin, accepts the first
+/// shallow-sea tile that has land within ~`land_search_radius` units, and
+/// falls back to "first water tile we found" if nothing has nearby land.
+pub fn find_player_spawn(seed: u64, gen: &WorldGen) -> Vec3 {
+    let sampler = WorldSampler::new(seed);
+    let step = gen.tile_size * 8.0; // ~16 world units per ring
+    let max_rings = 96;
+    let land_search_radius = 220.0;
+
+    let mut fallback: Option<Vec3> = None;
+
+    for ring in 1..=max_rings {
+        let r = step * ring as f32;
+        let samples = ((ring * 6) as i32).max(8);
+        for i in 0..samples {
+            let angle = (i as f32 / samples as f32) * std::f32::consts::TAU;
+            let x = r * angle.cos();
+            let z = r * angle.sin();
+            let h = sampler.elevation(x as f64, z as f64, gen.continent_frequency);
+
+            // Want shallow sea: deep enough to float in, not deep ocean.
+            let is_water = h < gen.sea_level - 0.03;
+            let is_shallow = h > gen.sea_level - 0.20;
+            if is_water && is_shallow {
+                if fallback.is_none() {
+                    fallback = Some(Vec3::new(x, 1.0, z));
+                }
+                if has_land_within(&sampler, gen, x, z, land_search_radius) {
+                    return Vec3::new(x, 1.0, z);
+                }
+            }
+        }
+    }
+
+    // No island in range — drop the player in the first water tile we saw,
+    // or back at origin (last-ditch; the world genuinely has no water here).
+    fallback.unwrap_or(Vec3::new(0.0, 1.0, 0.0))
+}
+
+fn has_land_within(
+    sampler: &WorldSampler,
+    gen: &WorldGen,
+    x: f32,
+    z: f32,
+    radius: f32,
+) -> bool {
+    let samples = 16;
+    for i in 0..samples {
+        let a = (i as f32 / samples as f32) * std::f32::consts::TAU;
+        let px = (x + radius * a.cos()) as f64;
+        let pz = (z + radius * a.sin()) as f64;
+        let h = sampler.elevation(px, pz, gen.continent_frequency);
+        if h > gen.sea_level + 0.02 {
+            return true;
+        }
+    }
+    false
+}
+
 /// Marker component for a generated chunk entity.
 #[derive(Component)]
 pub struct Chunk {

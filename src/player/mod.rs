@@ -10,6 +10,7 @@ use bevy::prelude::*;
 
 use crate::physics::{Body, Environment, Floats};
 use crate::treasure::{Treasure, TreasureFound};
+use crate::world::{find_player_spawn, WorldGen, WorldSeed};
 
 pub struct PlayerPlugin;
 
@@ -75,7 +76,18 @@ pub struct Inventory {
     pub gems: u32,
 }
 
-fn spawn_player_ship(mut commands: Commands) {
+fn spawn_player_ship(
+    mut commands: Commands,
+    seed: Res<WorldSeed>,
+    gen: Res<WorldGen>,
+) {
+    // Phase 1 spec: spawn in open water within sight of an island. World
+    // origin is NOT guaranteed to be water — Perlin noise puts whatever it
+    // wants there, so we search outward for a shallow-sea tile with land
+    // nearby instead of trusting (0, 0, 0).
+    let spawn = find_player_spawn(seed.0, &gen);
+    info!("Player spawn picked at world ({:.1}, {:.1})", spawn.x, spawn.z);
+
     // The player ship. Large floats = stable; low damping = carries momentum.
     commands.spawn((
         Player,
@@ -88,13 +100,16 @@ fn spawn_player_ship(mut commands: Commands) {
             air_breather: true,
         },
         Environment::default(),
-        SpatialBundle::from_transform(Transform::from_xyz(0.0, 0.0, 0.0)),
+        SpatialBundle::from_transform(Transform::from_translation(spawn)),
         Name::new("player_ship"),
     ));
 
-    // Simple overhead camera — flat graphics are the whole point.
+    // Camera initialised at the same offset `update_camera` will follow with
+    // — otherwise the first ~30 frames are a slow lerp from world origin.
+    let cam_offset = Vec3::new(0.0, 30.0, 25.0);
     commands.spawn(Camera3dBundle {
-        transform: Transform::from_xyz(0.0, 60.0, 30.0).looking_at(Vec3::ZERO, Vec3::Y),
+        transform: Transform::from_translation(spawn + cam_offset)
+            .looking_at(spawn, Vec3::Y),
         ..default()
     });
 
