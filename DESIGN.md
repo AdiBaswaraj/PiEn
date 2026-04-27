@@ -216,9 +216,8 @@ don't start phase N+1 until phase N is fun.
 
 ## 9. Open Questions (decide before they bite us)
 
-- **Saving on web?** If we keep wasm builds for later demos, save needs
-  IndexedDB instead of files. Decision deferred until we know wasm is
-  staying.
+- ~~**Saving on web?**~~ **Resolved** (2026-04): wasm is dropped;
+  this is a desktop-only game. Save = local file.
 - **Modding hooks?** `serde`-driven data files for biomes/creatures
   would make community content trivial. Decision: yes, after Phase 3.
 - **Procedural quests vs hand-authored beats?** Default to procedural

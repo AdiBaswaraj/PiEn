@@ -21,7 +21,6 @@ impl Plugin for PlayerPlugin {
                 Update,
                 (
                     handle_input,
-                    handle_touch_input,
                     update_camera,
                     pickup_nearby_treasure,
                     crew_status_readout,
@@ -141,56 +140,6 @@ fn handle_input(
     if keys.pressed(KeyCode::KeyS) {
         let fwd = Vec3::new(ship.heading.sin(), 0.0, ship.heading.cos());
         body.velocity -= fwd * dt * 3.0;
-    }
-}
-
-/// Touch input for mobile web. Split the screen into regions:
-/// * bottom-left quadrant — hold to steer (dx from region centre = rudder).
-/// * bottom-right quadrant — hold to throttle (vertical = W/S).
-/// * top-right corner — tap to hoist sail.
-/// * top-left corner — tap to drop sail.
-fn handle_touch_input(
-    touches: Res<Touches>,
-    windows: Query<&Window>,
-    time: Res<Time>,
-    mut q: Query<(&mut Ship, &mut Body, &mut Floats), With<Player>>,
-) {
-    let dt = time.delta_seconds();
-    let Ok(window) = windows.get_single() else { return };
-    let Ok((mut ship, mut body, mut floats)) = q.get_single_mut() else { return };
-    let w = window.width();
-    let h = window.height();
-
-    // Held touches — analog steering / throttle pads.
-    for touch in touches.iter() {
-        let p = touch.position();
-        let nx = p.x / w;
-        let ny = p.y / h;
-
-        if nx < 0.5 && ny > 0.55 {
-            let pad_cx = 0.25;
-            let dir = ((nx - pad_cx) / 0.25).clamp(-1.0, 1.0);
-            ship.rudder = (ship.rudder + dir * dt * 2.5).clamp(-1.0, 1.0);
-            ship.heading += ship.rudder * dt * 0.8;
-        }
-        if nx >= 0.5 && ny > 0.55 {
-            let pad_cy = 0.775;
-            let thrust = ((pad_cy - ny) / 0.225).clamp(-1.0, 1.0);
-            let fwd = Vec3::new(ship.heading.sin(), 0.0, ship.heading.cos());
-            body.velocity += fwd * dt * 6.0 * thrust;
-        }
-    }
-    // One-shot taps — sail hoist / drop.
-    for touch in touches.iter_just_pressed() {
-        let p = touch.position();
-        let nx = p.x / w;
-        let ny = p.y / h;
-        if nx > 0.75 && ny < 0.25 {
-            floats.sail = (floats.sail + 0.25).min(1.0);
-        }
-        if nx < 0.25 && ny < 0.25 {
-            floats.sail = (floats.sail - 0.25).max(0.0);
-        }
     }
 }
 

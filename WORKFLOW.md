@@ -124,9 +124,9 @@ Same flow for audio (Freesound.org with CC0 filter) and UI textures.
 
 ## Branch & merge policy
 
-- Default branch is currently `claude/pirate-game-engine-EPMnv`. Once
-  you're back on PC and the wasm/mobile cleanup is done, we'll either
-  rename it `main` or merge into `main` and delete this one.
+- Default branch is currently `claude/pirate-game-engine-EPMnv`. We'll
+  either rename it `main` or merge into `main` and delete it once the
+  Phase 1 milestone lands.
 - I never push to other branches without you saying so.
 - I never force-push, rewrite history, or delete branches without you
   saying so.

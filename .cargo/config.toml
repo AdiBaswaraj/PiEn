@@ -1,5 +1,0 @@
-# getrandom 0.3 needs an opt-in cfg flag on wasm to pick the JS backend.
-# This makes every wasm32 build pick up the right backend without each
-# dependency having to feature-gate it.
-[target.wasm32-unknown-unknown]
-rustflags = ['--cfg', 'getrandom_backend="wasm_js"']
